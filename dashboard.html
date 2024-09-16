@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contacts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <nav class="border-2 border-black h-16 w-screen bg-slate-50 shadow-lg p-3 text-black flex justify-between items-center">
+        <div>
+            <i class="fa text-3xl cursor-pointer ">&#xf007; &nbsp;</i>
+            <span class="text-2xl user_name">User Name</span>
+        </div>
+        <div class="cursor-pointer log_out">
+            <i class="fa text-3xl">&#xf08b; &nbsp;</i>
+        </div>
+    </nav>
+    <div class="p-5 flex items-center gap-5">
+        <i class="fa text-5xl cursor-pointer open-modal">&#xf196;</i>
+        <input type="text" id="myInput" onkeyup="myFunction()" class="border-2 border-black rounded-lg h-10 w-72 p-2" placeholder="Search..." /> 
+    </div>
+    <div>
+        <table id="myTable" class="border-black border-2 w-full bg-white">
+            <thead>
+                <tr class="border border-black bg-gray-200">
+                    <th class="border-2 border-black p-2">Name</th>
+                    <th class="border-2 border-black p-2">Email</th>
+                    <th class="border-2 border-black p-2">Phone</th>
+                    <th class="border-2 border-black p-2 w-16">Edit</th>
+                    <th class="border-2 border-black p-2 w-16"><i class="fa cursor-pointer text-3xl del-cont">&#xf014;</i></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal HTML -->
+    <div id="contactModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-80 relative">
+            <span class="absolute top-2 right-2 text-2xl cursor-pointer close-modal">&times;</span>
+            <h2 class="text-xl font-bold mb-4">Add New Contact</h2><h3 class="hidden"></h3>
+            <form id="contactForm">
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" id="name" class="mt-1 block w-full h-5 pt-4 pb-4 pl-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required />
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="email" class="mt-1 block w-full h-5 pt-4 pb-4 pl-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required />
+                </div>
+                <div class="mb-4">
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+                    <input type="text" id="phone" class="mt-1 block w-full h-5 pt-4 pb-4 pl-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required />
+                </div>
+                <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Add Contact</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let token;
+        let cont_id=[];
+        $(document).ready(function () {
+            // Get token and user name from session storage
+            token = sessionStorage.getItem("token");
+            let name = sessionStorage.getItem("name");
+            if(token==="" || token==null)
+                window.location.href = "index.html";
+            // Set user name in the UI
+            $(".user_name").html(name);
+
+            // Fetch contacts
+            getall();
+
+            // Logout functionality
+            $(".log_out").click(function () {
+                window.location.href = "index.html";
+                sessionStorage.setItem("token","")
+            });
+
+            // Open modal
+            $(".open-modal").click(function () {
+                $("#contactModal").removeClass("hidden");
+                $("#contactForm button").text("Add Contact")
+                $("#contactModal div h2").text("Add New Contact")
+            });
+            $(document).on("click",".openmodal",function(){
+                $("#contactModal").removeClass("hidden");
+                $("#contactForm button").text("Update");
+                $("#contactModal div h2").text("Update This Contact");
+                const a=$(this).closest("tr").find("td")
+                $("#name").val(a.eq(1).text());
+                $("#email").val(a.eq(2).text());
+                $("#phone").val(a.eq(3).text());
+                $("#contactModal div h3").text(a.eq(0).text())
+            })
+
+            // Close modal
+            $(".close-modal").click(function () {
+                $("#contactModal").addClass("hidden");
+                $('#contactForm')[0].reset();
+            });
+
+            // Handle form submission
+            $("#contactForm").submit(function (event) {
+                event.preventDefault();
+                const name = $("#name").val();
+                const email = $("#email").val();
+                const phone = $("#phone").val();
+                const a=$("#contactForm button").text()
+                if(a==="Add Contact"){
+                    $.ajax({
+                        url: "http://localhost:5001/api/contacts",
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        data: JSON.stringify({ name, email, phone }),
+                        success: function () {
+                            $("#contactModal").addClass("hidden");
+                            getall(); // Refresh the contact list
+                            $('#contactForm')[0].reset();
+                            alert("New Contact Added!")
+                        },
+                        error: function (error) {
+                            console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
+                        }
+                    });
+                }
+                else{
+                    const check=confirm("Do you really want to updata??")
+                    if(!check) return
+                    $.ajax({
+                        url: `http://localhost:5001/api/contacts/${$("#contactModal div h3").text()}`,
+                        method: "PUT",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        data: JSON.stringify({ name, email, phone }),
+                        success: function () {
+                            $("#contactModal").addClass("hidden");
+                            getall(); // Refresh the contact list
+                            alert("Contact Updated!")
+                            $('#contactForm')[0].reset();
+                        },
+                        error: function (error) {
+                            console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
+                            $('#contactForm')[0].reset();
+                        }
+                    });
+                }
+            });
+            $(document).on("click",".del_cont",function(){
+                const a=$(this).is(":checked");
+                const value=$(this).closest("tr").children("td").first().text();
+                if(a)
+                    cont_id.push(value)
+                else{
+                    const index=cont_id.indexOf(value);
+                    cont_id.splice(index, 1);
+                }
+            })
+            $(document).on("click",".del-cont",function(){
+                if(cont_id=="")
+                    alert("Plese Select Contect!")
+                else{
+                    const check=confirm("Do you really want to updata??")
+                    if(!check) return
+                    $.ajax({
+                        url: `http://localhost:5001/api/contacts/${cont_id}`,
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        success: function () {
+                            getall(); // Refresh the contact list
+                            alert("Contact Deleted!")
+                        },
+                        error: function (error) {
+                            console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
+                        }
+                    });
+                }
+            })
+        });
+
+        function getall() {
+            $.ajax({
+                url: "http://localhost:5001/api/contacts",
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}` // Ensure `token` is correctly set
+                },
+                success: function (data) {
+                    //console.log(data); // Inspect the data structure in the console
+
+                    // Clear existing rows (except header)
+                    $("#myTable").find("tbody").empty();
+
+                    // Iterate over the data and create table rows
+                    data.forEach(contact => {
+                        // Assuming contact object has properties: name, email, phone
+                        const row = `
+                            <tr class="border-2 border-black h-10">
+                                <td class="hidden">${contact._id}</td>
+                                <td class="border-2 border-black pl-2">${contact.name}</td>
+                                <td class="border-2 border-black pl-2">${contact.email}</td>
+                                <td class="border-2 border-black pl-2">${contact.phone}</td>
+                                <td class="border-2 border-black pl-2"><i class="fa text-2xl rounded-2xl ml-1 cursor-pointer openmodal">&#xf044; &nbsp;</i></td>
+                                <td class="h-10 border-black flex justify-center items-center"><input type="checkbox" name="del_cont" class="h-5 w-5 cursor-pointer del_cont"></td> 
+                            </tr>
+                        `;
+                        $("#myTable").find("tbody").append(row);
+                    });
+                },
+                error: function (error) {
+                    window.location.href = "index.html";
+                    console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
+                }
+            });
+        }
+
+        function myFunction() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 1; i < tr.length; i++) { // Start from 1 to skip header row
+                td = tr[i].getElementsByTagName("td")[1];
+                td1 = tr[i].getElementsByTagName("td")[2];
+                td2 = tr[i].getElementsByTagName("td")[3];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    txtValue1 = td1.textContent || td1.innerText;
+                    txtValue2 = td2.textContent || td2.innerText;
+                    if (
+                        txtValue.toUpperCase().indexOf(filter) > -1 ||
+                        txtValue1.toUpperCase().indexOf(filter) > -1 ||
+                        txtValue2.toUpperCase().indexOf(filter) > -1
+                    ) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
