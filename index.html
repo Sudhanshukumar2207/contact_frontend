@@ -86,8 +86,8 @@
           password: $("#t5").val().trim(),
         },
         success: function (data) {
-          // alert(data)
-          console.log(data)
+          alert("Registered Successfull!")
+          // console.log(data)
         },
         error: function (error) {
           alert(error.responseJSON.error)
