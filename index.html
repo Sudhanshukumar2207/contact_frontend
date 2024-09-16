@@ -60,7 +60,7 @@
     });
     function login() {
       $.ajax({
-        url: "http://localhost:5001/api/user/login",
+        url: "https://contact-backend-0eoh.onrender.com/api/user/login",
         method: "POST",
         data: {
           userphone: $("#t1").val().trim(),
@@ -78,7 +78,7 @@
     }
     function signup() {
       $.ajax({
-        url: "http://localhost:5001/api/user/register",
+        url: "https://contact-backend-0eoh.onrender.com/api/user/register",
         method: "POST",
         data: {
           username: $("#t3").val().trim(),

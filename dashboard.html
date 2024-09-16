@@ -115,7 +115,7 @@
                 const a=$("#contactForm button").text()
                 if(a==="Add Contact"){
                     $.ajax({
-                        url: "http://localhost:5001/api/contacts",
+                        url: "https://contact-backend-0eoh.onrender.com/api/contacts",
                         method: "POST",
                         headers: {
                             "Authorization": `Bearer ${token}`,
@@ -134,10 +134,10 @@
                     });
                 }
                 else{
-                    const check=confirm("Do you really want to updata??")
+                    const check=confirm("Do you really want to update??")
                     if(!check) return
                     $.ajax({
-                        url: `http://localhost:5001/api/contacts/${$("#contactModal div h3").text()}`,
+                        url: `https://contact-backend-0eoh.onrender.com/api/contacts/${$("#contactModal div h3").text()}`,
                         method: "PUT",
                         headers: {
                             "Authorization": `Bearer ${token}`,
@@ -174,7 +174,7 @@
                     const check=confirm("Do you really want to updata??")
                     if(!check) return
                     $.ajax({
-                        url: `http://localhost:5001/api/contacts/${cont_id}`,
+                        url: `https://contact-backend-0eoh.onrender.com/api/contacts/${cont_id}`,
                         method: "DELETE",
                         headers: {
                             "Authorization": `Bearer ${token}`,
@@ -194,7 +194,7 @@
 
         function getall() {
             $.ajax({
-                url: "http://localhost:5001/api/contacts",
+                url: "https://contact-backend-0eoh.onrender.com/api/contacts",
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}` // Ensure `token` is correctly set
