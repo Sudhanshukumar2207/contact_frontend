@@ -88,6 +88,8 @@
         success: function (data) {
           alert("Registered Successfull!")
           $("#signup")[0].reset();
+        $(".signup").css("display", "none");
+        $(".login").css("display", "block");
           // console.log(data)
         },
         error: function (error) {
