@@ -53,7 +53,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="email" class="mt-1 block w-full h-5 pt-4 pb-4 pl-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required />
+                    <input type="email" id="email" class="mt-1 block w-full h-5 pt-4 pb-4 pl-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div class="mb-4">
                     <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
@@ -118,6 +118,7 @@
                 if(a==="Add Contact"){
                     $.ajax({
                         url: "https://contact-backend-0eoh.onrender.com/api/contacts",
+                        // url:"http://localhost:5001/api/contacts/",
                         method: "POST",
                         headers: {
                             "Authorization": `Bearer ${token}`,
@@ -131,7 +132,11 @@
                             alert("New Contact Added!")
                         },
                         error: function (error) {
-                            console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
+                            if (error.status==500)
+                                alert("Number allready saved!")
+                            else
+                                console.error("error",error.responseText)
+                            // console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
                         }
                     });
                 }
@@ -140,6 +145,7 @@
                     if(!check) return
                     $.ajax({
                         url: `https://contact-backend-0eoh.onrender.com/api/contacts/${$("#contactModal div h3").text()}`,
+                        // url:`http://localhost:5001/api/contacts/${$("#contactModal div h3").text()}`,
                         method: "PUT",
                         headers: {
                             "Authorization": `Bearer ${token}`,
@@ -153,8 +159,13 @@
                             $('#contactForm')[0].reset();
                         },
                         error: function (error) {
-                            console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
-                            $('#contactForm')[0].reset();
+                            if (error.status==500)
+                                alert("Number allready saved!")
+                            else{
+                                console.error("error",error.responseText)
+                                // console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
+                                $('#contactForm')[0].reset();
+                            }
                         }
                     });
                 }
