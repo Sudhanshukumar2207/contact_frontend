@@ -65,11 +65,9 @@
     </div>
 
     <script>
-        let token;
         let cont_id=[];
         $(document).ready(function () {
             // Get token and user name from session storage
-            token = sessionStorage.getItem("token");
             let name = sessionStorage.getItem("name");
             if(token==="" || token==null)
                 window.location.href = "index.html";
@@ -121,7 +119,7 @@
                         // url:"http://localhost:5001/api/contacts/",
                         method: "POST",
                         headers: {
-                            "Authorization": `Bearer ${token}`,
+                            "Authorization": `Bearer ${sessionStorage.getItem("token")}`,
                             "Content-Type": "application/json"
                         },
                         data: JSON.stringify({ name, email, phone }),
@@ -148,7 +146,7 @@
                         // url:`http://localhost:5001/api/contacts/${$("#contactModal div h3").text()}`,
                         method: "PUT",
                         headers: {
-                            "Authorization": `Bearer ${token}`,
+                            "Authorization": `Bearer ${sessionStorage.getItem("token")}`,
                             "Content-Type": "application/json"
                         },
                         data: JSON.stringify({ name, email, phone }),
@@ -191,7 +189,7 @@
                         // url: `http://localhost:5001/api/contacts/${cont_id}`,
                         method: "DELETE",
                         headers: {
-                            "Authorization": `Bearer ${token}`,
+                            "Authorization": `Bearer ${sessionStorage.getItem("token")}`,
                             "Content-Type": "application/json"
                         },
                         success: function () {
@@ -212,7 +210,7 @@
                 // url:"http://localhost:5001/api/contacts",
                 method: "GET",
                 headers: {
-                    "Authorization": `Bearer ${token}` // Ensure `token` is correctly set
+                    "Authorization": `Bearer ${sessionStorage.getItem("token")}` // Ensure `token` is correctly set
                 },
                 success: function (data) {
                     //console.log(data); // Inspect the data structure in the console
