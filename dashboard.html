@@ -83,13 +83,21 @@
                 sessionStorage.clear()
             });
 
+            function validation(){
+                if(name) return true;
+                window.location.href = "index.html";
+                return false;
+            };
+
             // Open modal
             $(".open-modal").click(function () {
+                if(!validation()) return;
                 $("#contactModal").removeClass("hidden");
                 $("#contactForm button").text("Add Contact")
                 $("#contactModal div h2").text("Add New Contact")
             });
             $(document).on("click",".openmodal",function(){
+                if(!validation()) return;
                 $("#contactModal").removeClass("hidden");
                 $("#contactForm button").text("Update");
                 $("#contactModal div h2").text("Update This Contact");
@@ -98,7 +106,7 @@
                 $("#email").val(a.eq(2).text());
                 $("#phone").val(a.eq(3).text());
                 $("#contactModal div h3").text(a.eq(0).text())
-            })
+            });
 
             // Close modal
             $(".close-modal").click(function () {
@@ -109,6 +117,7 @@
             // Handle form submission
             $("#contactForm").submit(function (event) {
                 event.preventDefault();
+                if(!validation()) return;
                 const name = $("#name").val();
                 const email = $("#email").val();
                 const phone = $("#phone").val();
@@ -169,6 +178,7 @@
                 }
             });
             $(document).on("click",".del_cont",function(){
+                if(!validation()) return;
                 const a=$(this).is(":checked");
                 const value=$(this).closest("tr").children("td").first().text();
                 if(a)
@@ -177,8 +187,9 @@
                     const index=cont_id.indexOf(value);
                     cont_id.splice(index, 1);
                 }
-            })
+            });
             $(document).on("click",".del-cont",function(){
+                if(!validation()) return;
                 if(cont_id=="")
                     alert("Plese Select Contect!")
                 else{
@@ -201,73 +212,75 @@
                         }
                     });
                 }
-            })
-        });
-
-        function getall() {
-            $.ajax({
-                url: "https://contact-backend-0eoh.onrender.com/api/contacts",
-                // url:"http://localhost:5001/api/contacts",
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${sessionStorage.getItem("token")}` // Ensure `token` is correctly set
-                },
-                success: function (data) {
-                    //console.log(data); // Inspect the data structure in the console
-
-                    // Clear existing rows (except header)
-                    $("#myTable").find("tbody").empty();
-
-                    // Iterate over the data and create table rows
-                    data.forEach(contact => {
-                        // Assuming contact object has properties: name, email, phone
-                        const row = `
-                            <tr class="border-2 border-black h-10">
-                                <td class="hidden">${contact._id}</td>
-                                <td class="border-2 border-black pl-2">${contact.name}</td>
-                                <td class="border-2 border-black pl-2">${contact.email}</td>
-                                <td class="border-2 border-black pl-2">${contact.phone}</td>
-                                <td class="border-2 border-black pl-2"><i class="fa text-2xl rounded-2xl ml-1 cursor-pointer openmodal">&#xf044; &nbsp;</i></td>
-                                <td class="h-10 border-black flex justify-center items-center"><input type="checkbox" name="del_cont" class="h-5 w-5 cursor-pointer del_cont"></td> 
-                            </tr>
-                        `;
-                        $("#myTable").find("tbody").append(row);
-                    });
-                },
-                error: function (error) {
-                    window.location.href = "index.html";
-                    console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
-                }
             });
-        }
 
-        function myFunction() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("myTable");
-            tr = table.getElementsByTagName("tr");
+            function getall() {
+                if(!validation()) return;
+                $.ajax({
+                    url: "https://contact-backend-0eoh.onrender.com/api/contacts",
+                    // url:"http://localhost:5001/api/contacts",
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${sessionStorage.getItem("token")}` // Ensure `token` is correctly set
+                    },
+                    success: function (data) {
+                        //console.log(data); // Inspect the data structure in the console
+                    
+                        // Clear existing rows (except header)
+                        $("#myTable").find("tbody").empty();
+                    
+                        // Iterate over the data and create table rows
+                        data.forEach(contact => {
+                            // Assuming contact object has properties: name, email, phone
+                            const row = `
+                                <tr class="border-2 border-black h-10">
+                                    <td class="hidden">${contact._id}</td>
+                                    <td class="border-2 border-black pl-2">${contact.name}</td>
+                                    <td class="border-2 border-black pl-2">${contact.email}</td>
+                                    <td class="border-2 border-black pl-2">${contact.phone}</td>
+                                    <td class="border-2 border-black pl-2"><i class="fa text-2xl rounded-2xl ml-1 cursor-pointer openmodal">&#xf044; &nbsp;</i></td>
+                                    <td class="h-10 border-black flex justify-center items-center"><input type="checkbox" name="del_cont" class="h-5 w-5 cursor-pointer del_cont"></td> 
+                                </tr>
+                            `;
+                            $("#myTable").find("tbody").append(row);
+                        });
+                    },
+                    error: function (error) {
+                        window.location.href = "index.html";
+                        console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
+                    }
+                });
+            };
 
-            for (i = 1; i < tr.length; i++) { // Start from 1 to skip header row
-                td = tr[i].getElementsByTagName("td")[1];
-                td1 = tr[i].getElementsByTagName("td")[2];
-                td2 = tr[i].getElementsByTagName("td")[3];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    txtValue1 = td1.textContent || td1.innerText;
-                    txtValue2 = td2.textContent || td2.innerText;
-                    if (
-                        txtValue.toUpperCase().indexOf(filter) > -1 ||
-                        txtValue1.toUpperCase().indexOf(filter) > -1 ||
-                        txtValue2.toUpperCase().indexOf(filter) > -1
-                    ) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
+            function myFunction() {
+                if(!validation()) return;
+                var input, filter, table, tr, td, i, txtValue;
+                input = document.getElementById("myInput");
+                filter = input.value.toUpperCase();
+                table = document.getElementById("myTable");
+                tr = table.getElementsByTagName("tr");
+            
+                for (i = 1; i < tr.length; i++) { // Start from 1 to skip header row
+                    td = tr[i].getElementsByTagName("td")[1];
+                    td1 = tr[i].getElementsByTagName("td")[2];
+                    td2 = tr[i].getElementsByTagName("td")[3];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        txtValue1 = td1.textContent || td1.innerText;
+                        txtValue2 = td2.textContent || td2.innerText;
+                        if (
+                            txtValue.toUpperCase().indexOf(filter) > -1 ||
+                            txtValue1.toUpperCase().indexOf(filter) > -1 ||
+                            txtValue2.toUpperCase().indexOf(filter) > -1
+                        ) {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
                     }
                 }
-            }
-        }
+            };
+        });
     </script>
 </body>
 </html>
