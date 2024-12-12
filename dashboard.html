@@ -84,7 +84,7 @@
             });
 
             function validation(){
-                if(name) return true;
+                if(sessionStorage.getItem("token")) return true;
                 window.location.href = "index.html";
                 return false;
             };
