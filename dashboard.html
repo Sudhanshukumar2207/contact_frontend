@@ -67,37 +67,29 @@
     <script>
         let cont_id=[];
         $(document).ready(function () {
-            // Get token and user name from session storage
+
             let name = sessionStorage.getItem("name");
             if(name==="" || name==null)
                 window.location.href = "index.html";
-            // Set user name in the UI
+
             $(".user_name").html(name);
 
             // Fetch contacts
             getall();
 
-            // Logout functionality
             $(".log_out").click(function () {
                 sessionStorage.clear()
                 location.reload();
             });
 
-            // function validation(){
-            //     if(sessionStorage.getItem("token")) return true;
-            //     location.reload();
-            //     return false;
-            // };
-
             // Open modal
             $(".open-modal").click(function () {
-                // if(!validation()) return;
                 $("#contactModal").removeClass("hidden");
                 $("#contactForm button").text("Add Contact")
                 $("#contactModal div h2").text("Add New Contact")
             });
+
             $(document).on("click",".openmodal",function(){
-                // if(!validation()) return;
                 $("#contactModal").removeClass("hidden");
                 $("#contactForm button").text("Update");
                 $("#contactModal div h2").text("Update This Contact");
@@ -114,10 +106,8 @@
                 $('#contactForm')[0].reset();
             });
 
-            // Handle form submission
             $("#contactForm").submit(function (event) {
                 event.preventDefault();
-                // if(!validation()) return;
                 const name = $("#name").val();
                 const email = $("#email").val();
                 const phone = $("#phone").val();
@@ -134,7 +124,7 @@
                         data: JSON.stringify({ name, email, phone }),
                         success: function () {
                             $("#contactModal").addClass("hidden");
-                            getall(); // Refresh the contact list
+                            getall();
                             $('#contactForm')[0].reset();
                             alert("New Contact Added!")
                         },
@@ -143,7 +133,6 @@
                                 alert("Number allready saved!")
                             else
                                 console.error("error",error.responseText)
-                            // console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
                         }
                     });
                 }
@@ -161,7 +150,7 @@
                         data: JSON.stringify({ name, email, phone }),
                         success: function () {
                             $("#contactModal").addClass("hidden");
-                            getall(); // Refresh the contact list
+                            getall();
                             alert("Contact Updated!")
                             $('#contactForm')[0].reset();
                         },
@@ -170,15 +159,14 @@
                                 alert("Number allready saved!")
                             else{
                                 console.error("error",error.responseText)
-                                // console.error("Error:", error.responseJSON ? error.responseJSON.error : 'An error occurred');
                                 $('#contactForm')[0].reset();
                             }
                         }
                     });
                 }
             });
+
             $(document).on("click",".del_cont",function(){
-                // if(!validation()) return;
                 const a=$(this).is(":checked");
                 const value=$(this).closest("tr").children("td").first().text();
                 if(a)
@@ -188,8 +176,8 @@
                     cont_id.splice(index, 1);
                 }
             });
+            
             $(document).on("click",".del-cont",function(){
-                // if(!validation()) return;
                 if(cont_id=="")
                     alert("Plese Select Contect!")
                 else{
@@ -204,7 +192,7 @@
                             "Content-Type": "application/json"
                         },
                         success: function () {
-                            getall(); // Refresh the contact list
+                            getall();
                             alert("Contact Deleted!")
                         },
                         error: function (error) {
@@ -215,23 +203,17 @@
             });
 
             function getall() {
-                // if(!validation()) return;
                 $.ajax({
                     url: "https://contact-backend-0eoh.onrender.com/api/contacts",
                     // url:"http://localhost:5001/api/contacts",
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${sessionStorage.getItem("token")}` // Ensure `token` is correctly set
+                        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
                     },
                     success: function (data) {
-                        //console.log(data); // Inspect the data structure in the console
-                    
-                        // Clear existing rows (except header)
                         $("#myTable").find("tbody").empty();
                     
-                        // Iterate over the data and create table rows
                         data.forEach(contact => {
-                            // Assuming contact object has properties: name, email, phone
                             const row = `
                                 <tr class="border-2 border-black h-10">
                                     <td class="hidden">${contact._id}</td>
@@ -254,15 +236,13 @@
         });
 
 function myFunction() {
-    // if(!sessionStorage.getItem("token"))
-    //     location.reload();
     var input, filter, table, tr, td, i, txtValue;
     input = document.getElementById("myInput");
     filter = input.value.toUpperCase();
     table = document.getElementById("myTable");
     tr = table.getElementsByTagName("tr");
 
-    for (i = 1; i < tr.length; i++) { // Start from 1 to skip header row
+    for (i = 1; i < tr.length; i++) { 
         td = tr[i].getElementsByTagName("td")[1];
         td1 = tr[i].getElementsByTagName("td")[2];
         td2 = tr[i].getElementsByTagName("td")[3];

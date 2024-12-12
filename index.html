@@ -54,10 +54,12 @@
       $(".login").css({ display: "none" });
       $(".signup").css({ display: "block" });
     });
+    
     $("#log").click(function () {
       $(".signup").css("display", "none");
       $(".login").css("display", "block");
     });
+
     function login() {
       $.ajax({
         url: "https://contact-backend-0eoh.onrender.com/api/user/login",
@@ -77,6 +79,7 @@
         },
       });
     }
+
     function signup() {
       $.ajax({
         url: "https://contact-backend-0eoh.onrender.com/api/user/register",
@@ -91,7 +94,6 @@
           $("#signup")[0].reset();
         $(".signup").css("display", "none");
         $(".login").css("display", "block");
-          // console.log(data)
         },
         error: function (error) {
           alert(error.responseJSON.error)
