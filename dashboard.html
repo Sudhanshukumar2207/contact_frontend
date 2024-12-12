@@ -82,7 +82,7 @@
             // Logout functionality
             $(".log_out").click(function () {
                 window.location.href = "index.html";
-                sessionStorage.setItem("token","")
+                sessionStorage.clear()
             });
 
             // Open modal
@@ -184,10 +184,11 @@
                 if(cont_id=="")
                     alert("Plese Select Contect!")
                 else{
-                    const check=confirm("Do you really want to updata??")
+                    const check=confirm("Do you really want to Delete??")
                     if(!check) return
                     $.ajax({
                         url: `https://contact-backend-0eoh.onrender.com/api/contacts/${cont_id}`,
+                        // url: `http://localhost:5001/api/contacts/${cont_id}`,
                         method: "DELETE",
                         headers: {
                             "Authorization": `Bearer ${token}`,
@@ -208,6 +209,7 @@
         function getall() {
             $.ajax({
                 url: "https://contact-backend-0eoh.onrender.com/api/contacts",
+                // url:"http://localhost:5001/api/contacts",
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}` // Ensure `token` is correctly set
