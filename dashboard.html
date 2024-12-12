@@ -85,7 +85,7 @@
 
             function validation(){
                 if(sessionStorage.getItem("token")) return true;
-                window.location.href = "index.html";
+                location.reload();
                 return false;
             };
 
